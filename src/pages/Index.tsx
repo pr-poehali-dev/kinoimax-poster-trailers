@@ -10,7 +10,7 @@ const Index = () => {
   const [selectedSession, setSelectedSession] = useState<{movieId: number, time: string} | null>(null)
   const [showHeroVideo, setShowHeroVideo] = useState(true)
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
-  const [currentView, setCurrentView] = useState<'home' | 'schedule'>('home')
+  const [currentPage, setCurrentPage] = useState<'home' | 'schedule'>('home')
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const movies = [
@@ -20,7 +20,7 @@ const Index = () => {
       ageRating: '16+',
       poster: 'https://m.media-amazon.com/images/M/MV5BNmY2OTFiYmYtZjFhMS00MDAxLWI0NmItYjg4YTU3NDBmZGQwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
       trailer: 'https://media.cinemabox.team/net/c5/movies/12894/trailer-plagiator.mp4',
-      genre: 'романтическая комедия, музыкальный',
+      genre: 'Романтическая комедия, музыкальный',
       duration: '108 мин',
       year: '2024',
       sessions: ['12:30', '14:50', '19:45', '22:25']
@@ -172,17 +172,17 @@ const Index = () => {
             </div>
             <nav className="hidden md:flex items-center space-x-8">
               <button 
-                onClick={() => setCurrentView('home')}
+                onClick={() => setCurrentPage('home')}
                 className={`transition-colors font-medium ${
-                  currentView === 'home' ? 'text-cinema-orange' : 'text-white hover:text-cinema-orange'
+                  currentPage === 'home' ? 'text-cinema-orange' : 'text-white hover:text-cinema-orange'
                 }`}
               >
                 Главная
               </button>
               <button 
-                onClick={() => setCurrentView('schedule')}
+                onClick={() => setCurrentPage('schedule')}
                 className={`transition-colors font-medium ${
-                  currentView === 'schedule' ? 'text-cinema-orange' : 'text-white hover:text-cinema-orange'
+                  currentPage === 'schedule' ? 'text-cinema-orange' : 'text-white hover:text-cinema-orange'
                 }`}
               >
                 Расписание
@@ -212,7 +212,7 @@ const Index = () => {
       </section>
 
       {/* Movies Grid */}
-      {currentView === 'home' && (
+      {currentPage === 'home' && (
         <section className="py-16 px-4">
           <div className="container mx-auto">
             <div className="text-center mb-12">
@@ -238,18 +238,21 @@ const Index = () => {
                         <Icon name="Play" size={32} className="text-white" />
                       </div>
                     </div>
-                    <Badge className="absolute top-3 left-3 bg-cinema-orange text-white font-bold z-10">
-                      {movie.ageRating}
-                    </Badge>
+
                     <div className="absolute top-3 right-3 bg-cinema-orange/90 rounded-full p-2">
                       <Icon name="Video" size={20} className="text-white" />
                     </div>
                   </div>
                   
                   <div className="p-4">
-                    <h4 className="font-bold text-white text-lg mb-3 leading-tight line-clamp-2">
-                      {movie.title}
-                    </h4>
+                    <div className="flex items-start justify-between mb-3">
+                      <h4 className="font-bold text-white text-lg leading-tight line-clamp-2 flex-1">
+                        {movie.title}
+                      </h4>
+                      <Badge className="bg-cinema-orange text-white font-bold ml-3 shrink-0">
+                        {movie.ageRating}
+                      </Badge>
+                    </div>
                     
                     <div className="flex items-center justify-between text-sm text-gray-300 mb-4">
                       <span>{movie.genre}</span>
@@ -283,7 +286,7 @@ const Index = () => {
       )}
 
       {/* Schedule View */}
-      {currentView === 'schedule' && (
+      {currentPage === 'schedule' && (
         <section className="py-16 px-4">
           <div className="container mx-auto">
             <div className="text-center mb-12">
@@ -405,13 +408,11 @@ const Index = () => {
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-white flex items-center space-x-3">
               <Icon name="Play" size={24} className="text-cinema-orange" />
-              <div className="flex flex-col">
-                <div className="flex items-center space-x-3">
-                  <Badge className="bg-cinema-orange text-white font-bold">
-                    {selectedMovieData?.ageRating}
-                  </Badge>
-                </div>
-                <span className="mt-2">{selectedMovieData?.title}</span>
+              <div className="flex items-center space-x-3 flex-1">
+                <span>{selectedMovieData?.title}</span>
+                <Badge className="bg-cinema-orange text-white font-bold">
+                  {selectedMovieData?.ageRating}
+                </Badge>
               </div>
             </DialogTitle>
           </DialogHeader>
@@ -458,65 +459,50 @@ const Index = () => {
             </div>
             
             {/* Схема зала */}
-            <div className="bg-gradient-to-b from-gray-800 to-gray-900 p-6 rounded-lg">
-              {/* Основные ряды */}
-              <div className="space-y-3 mb-6">
-                {Array.from({length: 12}, (_, rowIndex) => {
-                  const rowLetter = String.fromCharCode(65 + rowIndex) // A, B, C...
-                  const seatsInRow = rowIndex < 4 ? 16 : rowIndex < 8 ? 18 : 20 // Увеличиваем количество мест
-                  
-                  return (
-                    <div key={rowLetter} className="flex items-center justify-center space-x-1">
-                      <div className="w-8 text-center text-cinema-orange font-bold text-sm">{rowLetter}</div>
-                      <div className="flex space-x-1">
-                        {Array.from({length: seatsInRow}, (_, i) => {
-                          const seatId = `${rowLetter}${i + 1}`
-                          const isSelected = selectedSeats.includes(seatId)
-                          
-                          return (
-                            <button
-                              key={seatId}
-                              onClick={() => toggleSeat(seatId)}
-                              className={`w-6 h-6 rounded-full transition-all ${
-                                isSelected 
-                                  ? 'bg-cinema-orange shadow-lg scale-110' 
-                                  : 'bg-purple-600 hover:bg-purple-500 hover:scale-105'
-                              }`}
-                              style={{
-                                background: isSelected ? undefined : '#8B5CF6'
-                              }}
-                            />
-                          )
-                        })}
-                      </div>
-                      <div className="w-8 text-center text-cinema-orange font-bold text-sm">{rowIndex + 1}</div>
-                    </div>
-                  )
-                })}
+            <div className="relative bg-gradient-to-b from-gray-900 to-black p-6 rounded-lg max-h-[400px] overflow-y-auto">
+              {/* Основной зал */}
+              <div className="space-y-1 mb-6">
+                {Array.from({length: 18}, (_, rowIndex) => (
+                  <div key={rowIndex} className="flex justify-center space-x-1">
+                    {Array.from({length: 20}, (_, seatIndex) => {
+                      const seatId = `main-${rowIndex}-${seatIndex}`
+                      const isSelected = selectedSeats.includes(seatId)
+                      
+                      return (
+                        <button
+                          key={seatId}
+                          onClick={() => toggleSeat(seatId)}
+                          className={`w-3 h-3 rounded-full transition-all ${ 
+                            isSelected 
+                              ? 'bg-cinema-orange scale-125 shadow-lg' 
+                              : 'bg-purple-500 hover:bg-purple-400 hover:scale-110'
+                          }`}
+                        />
+                      )
+                    })}
+                  </div>
+                ))}
               </div>
               
-              {/* Боковые места */}
-              <div className="flex justify-between">
-                {/* Левая сторона */}
-                <div className="space-y-2">
-                  {Array.from({length: 3}, (_, i) => (
-                    <div key={`left-${i}`} className="flex space-x-1">
-                      {Array.from({length: 4}, (_, j) => {
-                        const seatId = `VL${i + 1}-${j + 1}`
+              {/* Боковые секции */}
+              <div className="flex justify-between mt-6">
+                {/* Левая секция */}
+                <div className="space-y-1">
+                  {Array.from({length: 8}, (_, rowIndex) => (
+                    <div key={rowIndex} className="flex space-x-1">
+                      {Array.from({length: 4}, (_, seatIndex) => {
+                        const seatId = `left-${rowIndex}-${seatIndex}`
                         const isSelected = selectedSeats.includes(seatId)
                         
                         return (
                           <button
                             key={seatId}
                             onClick={() => toggleSeat(seatId)}
-                            className={`w-6 h-6 rounded-full transition-all ${
+                            className={`w-3 h-3 rounded-full transition-all ${
                               isSelected 
-                                ? 'bg-cinema-orange shadow-lg scale-110' 
-                                : 'bg-purple-600 hover:bg-purple-500 hover:scale-105'
+                                ? 'bg-cinema-orange scale-125 shadow-lg' 
+                                : 'bg-purple-500 hover:bg-purple-400 hover:scale-110'
                             }`}
-                            style={{
-                              background: isSelected ? undefined : '#8B5CF6'
-                            }}
                           />
                         )
                       })}
@@ -524,26 +510,23 @@ const Index = () => {
                   ))}
                 </div>
                 
-                {/* Правая сторона */}
-                <div className="space-y-2">
-                  {Array.from({length: 3}, (_, i) => (
-                    <div key={`right-${i}`} className="flex space-x-1">
-                      {Array.from({length: 4}, (_, j) => {
-                        const seatId = `VR${i + 1}-${j + 1}`
+                {/* Правая секция */}
+                <div className="space-y-1">
+                  {Array.from({length: 8}, (_, rowIndex) => (
+                    <div key={rowIndex} className="flex space-x-1">
+                      {Array.from({length: 4}, (_, seatIndex) => {
+                        const seatId = `right-${rowIndex}-${seatIndex}`
                         const isSelected = selectedSeats.includes(seatId)
                         
                         return (
                           <button
                             key={seatId}
                             onClick={() => toggleSeat(seatId)}
-                            className={`w-6 h-6 rounded-full transition-all ${
+                            className={`w-3 h-3 rounded-full transition-all ${
                               isSelected 
-                                ? 'bg-cinema-orange shadow-lg scale-110' 
-                                : 'bg-purple-600 hover:bg-purple-500 hover:scale-105'
+                                ? 'bg-cinema-orange scale-125 shadow-lg' 
+                                : 'bg-purple-500 hover:bg-purple-400 hover:scale-110'
                             }`}
-                            style={{
-                              background: isSelected ? undefined : '#8B5CF6'
-                            }}
                           />
                         )
                       })}
@@ -552,6 +535,7 @@ const Index = () => {
                 </div>
               </div>
             </div>
+
             
             {/* Легенда */}
             <div className="flex justify-center space-x-6 text-sm">
