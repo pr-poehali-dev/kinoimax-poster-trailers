@@ -10,6 +10,7 @@ const Index = () => {
   const [selectedSession, setSelectedSession] = useState<{movieId: number, time: string} | null>(null)
   const [showHeroVideo, setShowHeroVideo] = useState(true)
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
+  const [currentView, setCurrentView] = useState<'home' | 'schedule'>('home')
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const movies = [
@@ -19,7 +20,7 @@ const Index = () => {
       ageRating: '16+',
       poster: 'https://m.media-amazon.com/images/M/MV5BNmY2OTFiYmYtZjFhMS00MDAxLWI0NmItYjg4YTU3NDBmZGQwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
       trailer: 'https://media.cinemabox.team/net/c5/movies/12894/trailer-plagiator.mp4',
-      genre: 'Триллер',
+      genre: 'романтическая комедия, музыкальный',
       duration: '108 мин',
       year: '2024',
       sessions: ['12:30', '14:50', '19:45', '22:25']
@@ -170,14 +171,24 @@ const Index = () => {
               <h1 className="text-3xl font-bold text-white tracking-wide">KINOIMAX</h1>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-white hover:text-cinema-orange transition-colors font-medium">Главная</a>
-              <a href="#" className="text-white hover:text-cinema-orange transition-colors font-medium">Афиша</a>
-              <a href="#" className="text-white hover:text-cinema-orange transition-colors font-medium">Расписание</a>
+              <button 
+                onClick={() => setCurrentView('home')}
+                className={`transition-colors font-medium ${
+                  currentView === 'home' ? 'text-cinema-orange' : 'text-white hover:text-cinema-orange'
+                }`}
+              >
+                Главная
+              </button>
+              <button 
+                onClick={() => setCurrentView('schedule')}
+                className={`transition-colors font-medium ${
+                  currentView === 'schedule' ? 'text-cinema-orange' : 'text-white hover:text-cinema-orange'
+                }`}
+              >
+                Расписание
+              </button>
               <a href="#" className="text-white hover:text-cinema-orange transition-colors font-medium">Контакты</a>
             </nav>
-            <Button className="bg-cinema-orange hover:bg-cinema-orange/80 text-white font-semibold px-6">
-              Купить билет
-            </Button>
           </div>
         </div>
       </header>
@@ -201,12 +212,13 @@ const Index = () => {
       </section>
 
       {/* Movies Grid */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h3 className="text-4xl font-bold text-white mb-4">Сейчас в кино</h3>
-            <p className="text-xl text-gray-300">Выберите фильм и посмотрите трейлер</p>
-          </div>
+      {currentView === 'home' && (
+        <section className="py-16 px-4">
+          <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <h3 className="text-4xl font-bold text-white mb-4">Сейчас в кино</h3>
+              <p className="text-xl text-gray-300">Выберите фильм и посмотрите трейлер</p>
+            </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {movies.map((movie) => (
@@ -265,9 +277,68 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Schedule View */}
+      {currentView === 'schedule' && (
+        <section className="py-16 px-4">
+          <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <h3 className="text-4xl font-bold text-white mb-4">Расписание сеансов</h3>
+              <p className="text-xl text-gray-300">Выберите время для посещения</p>
+            </div>
+            
+            <div className="space-y-8">
+              {movies.map((movie) => (
+                <div key={movie.id} className="bg-cinema-dark-blue/50 border border-cinema-orange/20 rounded-lg p-6 backdrop-blur-sm">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <img 
+                      src={movie.poster} 
+                      alt={movie.title}
+                      className="w-32 h-48 object-cover rounded-lg flex-shrink-0"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h4 className="text-2xl font-bold text-white mb-2">{movie.title}</h4>
+                          <div className="flex items-center gap-4 text-gray-300 mb-2">
+                            <span>{movie.genre}</span>
+                            <span>•</span>
+                            <span>{movie.duration}</span>
+                            <span>•</span>
+                            <span>{movie.year}</span>
+                          </div>
+                        </div>
+                        <Badge className="bg-cinema-orange text-white font-bold">
+                          {movie.ageRating}
+                        </Badge>
+                      </div>
+                      
+                      <div>
+                        <h5 className="text-lg font-semibold text-cinema-orange mb-4">Сеансы:</h5>
+                        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                          {movie.sessions.map((time) => (
+                            <Button
+                              key={time}
+                              onClick={() => handleSessionClick(movie.id, time)}
+                              className="bg-cinema-orange/20 text-cinema-orange hover:bg-cinema-orange hover:text-white border border-cinema-orange/50"
+                            >
+                              {time}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="bg-cinema-dark-blue/90 backdrop-blur-sm border-t border-cinema-orange/20 py-12">
@@ -332,14 +403,16 @@ const Index = () => {
       <Dialog open={selectedMovie !== null} onOpenChange={() => setSelectedMovie(null)}>
         <DialogContent className="max-w-4xl w-full h-[80vh] bg-cinema-dark-blue border-cinema-orange/20">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-white flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Icon name="Play" size={24} className="text-cinema-orange" />
-                <span>{selectedMovieData?.title}</span>
+            <DialogTitle className="text-2xl font-bold text-white flex items-center space-x-3">
+              <Icon name="Play" size={24} className="text-cinema-orange" />
+              <div className="flex flex-col">
+                <div className="flex items-center space-x-3">
+                  <Badge className="bg-cinema-orange text-white font-bold">
+                    {selectedMovieData?.ageRating}
+                  </Badge>
+                </div>
+                <span className="mt-2">{selectedMovieData?.title}</span>
               </div>
-              <Badge className="bg-cinema-orange text-white font-bold">
-                {selectedMovieData?.ageRating}
-              </Badge>
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 rounded-lg overflow-hidden">
@@ -385,51 +458,110 @@ const Index = () => {
             </div>
             
             {/* Схема зала */}
-            <div className="space-y-2 max-h-[400px] overflow-y-auto">
-              {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(row => (
-                <div key={row} className="flex items-center justify-center space-x-1">
-                  <div className="w-8 text-center text-cinema-orange font-bold">{row}</div>
-                  <div className="flex space-x-1">
-                    {Array.from({length: 12}, (_, i) => {
-                      const seatId = `${row}${i + 1}`
-                      const isOccupied = Math.random() < 0.3
-                      const isSelected = selectedSeats.includes(seatId)
-                      
-                      return (
-                        <button
-                          key={seatId}
-                          onClick={() => !isOccupied && toggleSeat(seatId)}
-                          disabled={isOccupied}
-                          className={`w-8 h-8 rounded-md text-xs font-bold transition-all ${
-                            isOccupied 
-                              ? 'bg-red-500 cursor-not-allowed opacity-50' 
-                              : isSelected 
-                                ? 'bg-cinema-orange text-white' 
-                                : 'bg-gray-600 hover:bg-gray-500 text-white'
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      )
-                    })}
-                  </div>
+            <div className="bg-gradient-to-b from-gray-800 to-gray-900 p-6 rounded-lg">
+              {/* Основные ряды */}
+              <div className="space-y-3 mb-6">
+                {Array.from({length: 12}, (_, rowIndex) => {
+                  const rowLetter = String.fromCharCode(65 + rowIndex) // A, B, C...
+                  const seatsInRow = rowIndex < 4 ? 16 : rowIndex < 8 ? 18 : 20 // Увеличиваем количество мест
+                  
+                  return (
+                    <div key={rowLetter} className="flex items-center justify-center space-x-1">
+                      <div className="w-8 text-center text-cinema-orange font-bold text-sm">{rowLetter}</div>
+                      <div className="flex space-x-1">
+                        {Array.from({length: seatsInRow}, (_, i) => {
+                          const seatId = `${rowLetter}${i + 1}`
+                          const isSelected = selectedSeats.includes(seatId)
+                          
+                          return (
+                            <button
+                              key={seatId}
+                              onClick={() => toggleSeat(seatId)}
+                              className={`w-6 h-6 rounded-full transition-all ${
+                                isSelected 
+                                  ? 'bg-cinema-orange shadow-lg scale-110' 
+                                  : 'bg-purple-600 hover:bg-purple-500 hover:scale-105'
+                              }`}
+                              style={{
+                                background: isSelected ? undefined : '#8B5CF6'
+                              }}
+                            />
+                          )
+                        })}
+                      </div>
+                      <div className="w-8 text-center text-cinema-orange font-bold text-sm">{rowIndex + 1}</div>
+                    </div>
+                  )
+                })}
+              </div>
+              
+              {/* Боковые места */}
+              <div className="flex justify-between">
+                {/* Левая сторона */}
+                <div className="space-y-2">
+                  {Array.from({length: 3}, (_, i) => (
+                    <div key={`left-${i}`} className="flex space-x-1">
+                      {Array.from({length: 4}, (_, j) => {
+                        const seatId = `VL${i + 1}-${j + 1}`
+                        const isSelected = selectedSeats.includes(seatId)
+                        
+                        return (
+                          <button
+                            key={seatId}
+                            onClick={() => toggleSeat(seatId)}
+                            className={`w-6 h-6 rounded-full transition-all ${
+                              isSelected 
+                                ? 'bg-cinema-orange shadow-lg scale-110' 
+                                : 'bg-purple-600 hover:bg-purple-500 hover:scale-105'
+                            }`}
+                            style={{
+                              background: isSelected ? undefined : '#8B5CF6'
+                            }}
+                          />
+                        )
+                      })}
+                    </div>
+                  ))}
                 </div>
-              ))}
+                
+                {/* Правая сторона */}
+                <div className="space-y-2">
+                  {Array.from({length: 3}, (_, i) => (
+                    <div key={`right-${i}`} className="flex space-x-1">
+                      {Array.from({length: 4}, (_, j) => {
+                        const seatId = `VR${i + 1}-${j + 1}`
+                        const isSelected = selectedSeats.includes(seatId)
+                        
+                        return (
+                          <button
+                            key={seatId}
+                            onClick={() => toggleSeat(seatId)}
+                            className={`w-6 h-6 rounded-full transition-all ${
+                              isSelected 
+                                ? 'bg-cinema-orange shadow-lg scale-110' 
+                                : 'bg-purple-600 hover:bg-purple-500 hover:scale-105'
+                            }`}
+                            style={{
+                              background: isSelected ? undefined : '#8B5CF6'
+                            }}
+                          />
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             
             {/* Легенда */}
             <div className="flex justify-center space-x-6 text-sm">
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-gray-600 rounded"></div>
+                <div className="w-4 h-4 bg-purple-600 rounded-full"></div>
                 <span className="text-gray-300">Свободно</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-cinema-orange rounded"></div>
+                <div className="w-4 h-4 bg-cinema-orange rounded-full"></div>
                 <span className="text-gray-300">Выбрано</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-red-500 rounded"></div>
-                <span className="text-gray-300">Занято</span>
               </div>
             </div>
             
