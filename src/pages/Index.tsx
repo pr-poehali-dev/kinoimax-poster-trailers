@@ -175,43 +175,28 @@ const Index = () => {
               <a href="#" className="text-white hover:text-cinema-orange transition-colors font-medium">Расписание</a>
               <a href="#" className="text-white hover:text-cinema-orange transition-colors font-medium">Контакты</a>
             </nav>
-            <div className="flex items-center space-x-4">
-              <Button 
-                onClick={() => setShowHeroVideo(true)}
-                variant="outline" 
-                className="border-cinema-orange text-cinema-orange hover:bg-cinema-orange hover:text-white"
-              >
-                <Icon name="Play" className="mr-2" size={16} />
-                Трейлер
-              </Button>
-              <Button className="bg-cinema-orange hover:bg-cinema-orange/80 text-white font-semibold px-6">
-                Купить билет
-              </Button>
-            </div>
+            <Button className="bg-cinema-orange hover:bg-cinema-orange/80 text-white font-semibold px-6">
+              Купить билет
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative py-16 px-4">
-        <div className="container mx-auto text-center">
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Современный кинотеатр<br />
-            <span className="text-cinema-orange">премиум-класса</span>
-          </h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Погрузитесь в мир кино с технологиями будущего. Уникальные фильмы, комфортные залы и незабываемые эмоции.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-cinema-orange hover:bg-cinema-orange/80 text-white font-semibold px-8 py-3">
-              <Icon name="Ticket" className="mr-2" size={20} />
-              Выбрать сеанс
-            </Button>
-            <Button size="lg" variant="outline" className="border-cinema-orange text-cinema-orange hover:bg-cinema-orange hover:text-white font-semibold px-8 py-3">
-              <Icon name="MapPin" className="mr-2" size={20} />
-              Как добраться
-            </Button>
-          </div>
+      {/* Hero Video Section */}
+      <section className="relative h-[70vh] overflow-hidden">
+        <video 
+          autoPlay
+          muted
+          loop
+          className="w-full h-full object-cover"
+          src="https://media.cinemabox.team/net/c5/movies/1000000000370/trailer-supermen-predseans-obsl-kuda-ukhodyat-papy.mp4"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div className="absolute bottom-8 left-8 text-white">
+          <h2 className="text-4xl md:text-5xl font-bold mb-3">Супермен в кино!</h2>
+          <Badge className="bg-cinema-orange text-white font-bold text-lg px-3 py-1">
+            12+
+          </Badge>
         </div>
       </section>
 
@@ -241,7 +226,7 @@ const Index = () => {
                         <Icon name="Play" size={32} className="text-white" />
                       </div>
                     </div>
-                    <Badge className="absolute top-3 left-3 bg-cinema-orange text-white font-bold">
+                    <Badge className="absolute top-3 left-3 bg-cinema-orange text-white font-bold z-10">
                       {movie.ageRating}
                     </Badge>
                     <div className="absolute top-3 right-3 bg-cinema-orange/90 rounded-full p-2">
@@ -264,17 +249,15 @@ const Index = () => {
                     {/* Расписание сеансов */}
                     <div className="border-t border-cinema-orange/20 pt-4">
                       <h5 className="text-sm font-semibold text-cinema-orange mb-3">Сеансы:</h5>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="flex flex-wrap gap-2">
                         {movie.sessions.map((time) => (
-                          <Button
+                          <span
                             key={time}
-                            size="sm"
-                            variant="outline"
-                            className="border-cinema-orange/50 text-white hover:bg-cinema-orange hover:text-white text-xs py-1 px-2"
                             onClick={() => handleSessionClick(movie.id, time)}
+                            className="bg-cinema-orange/20 text-cinema-orange px-3 py-1 rounded-md text-sm font-medium cursor-pointer hover:bg-cinema-orange hover:text-white transition-colors"
                           >
                             {time}
-                          </Button>
+                          </span>
                         ))}
                       </div>
                     </div>
