@@ -28,6 +28,12 @@ export default {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
+				cinema: {
+					orange: '#FF6B35',
+					'dark-blue': '#1A1A2E',
+					'light-blue': '#16537E',
+					'dark-gray': '#0F0F0F',
+				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
